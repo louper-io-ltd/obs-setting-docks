@@ -122,6 +122,8 @@ VideoDock::VideoDock(QWidget *parent) : QDockWidget(parent)
 	baseResolution->addItem(QStringLiteral("960x540 SD"));
 	baseResolution->addItem(QStringLiteral("1280x720 HD"));
 	baseResolution->addItem(QStringLiteral("1920x1080 Full HD"));
+	baseResolution->addItem(QStringLiteral("2048x1080 2K"));
+	baseResolution->addItem(QStringLiteral("2560x1440 2.5K"));
 	baseResolution->addItem(QStringLiteral("3840x2160 4K UHD"));
 	baseResolution->addItem(QStringLiteral("4096x2160 4K DCI"));
 
@@ -163,6 +165,8 @@ VideoDock::VideoDock(QWidget *parent) : QDockWidget(parent)
 	outputResolution->addItem(QStringLiteral("960x540 SD"));
 	outputResolution->addItem(QStringLiteral("1280x720 HD"));
 	outputResolution->addItem(QStringLiteral("1920x1080 Full HD"));
+	outputResolution->addItem(QStringLiteral("2048x1080 2K"));
+	outputResolution->addItem(QStringLiteral("2560x1440 2.5K"));
 	outputResolution->addItem(QStringLiteral("3840x2160 4K UHD"));
 	outputResolution->addItem(QStringLiteral("4096x2160 4K DCI"));
 
@@ -199,23 +203,13 @@ VideoDock::VideoDock(QWidget *parent) : QDockWidget(parent)
 	fps->setObjectName(QStringLiteral("fpsCommon"));
 	fps->setDuplicatesEnabled(false);
 	fps->setFrame(true);
-#ifdef LOUPER
+
 	fps->addItem(QStringLiteral("24"));
 	fps->addItem(QStringLiteral("25"));
-#else
-	fps->addItem(QStringLiteral("10"));
-	fps->addItem(QStringLiteral("20"));
-	fps->addItem("24 NTSC");
-	fps->addItem("25 PAL");
-#endif
 	fps->addItem(QStringLiteral("29.97"));
 	fps->addItem(QStringLiteral("30"));
 	fps->addItem(QStringLiteral("48"));
-#ifdef LOUPER
 	fps->addItem(QStringLiteral("50"));
-#else
-	fps->addItem("50 PAL");
-#endif
 	fps->addItem(QStringLiteral("59.94"));
 	fps->addItem(QStringLiteral("60"));
 
