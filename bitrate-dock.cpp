@@ -39,8 +39,11 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 	vBitrateLabel->setText(QT_UTF8(obs_module_text("VideoBitrate")));
 
 	mainLayout->addWidget(vBitrateLabel);
-#ifdef LOUPER
+
 	vBitrateEdit = new QComboBox(this);
+	
+	vBitrateEdit->addItem(QStringLiteral("1200 Kbps ") +
+			      QT_UTF8(obs_module_text("Low")));	
 	vBitrateEdit->addItem(QStringLiteral("2500 Kbps ") +
 			      QT_UTF8(obs_module_text("Balanced")));
 	vBitrateEdit->addItem(QStringLiteral("4000 Kbps ") +
@@ -53,6 +56,8 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 			      QT_UTF8(obs_module_text("UltraHigh")));
 	vBitrateEdit->addItem(QStringLiteral("15000 Kbps ") +
 			      QT_UTF8(obs_module_text("Extreme")));
+	vBitrateEdit->addItem(QStringLiteral("20000 Kbps ") +
+			      QT_UTF8(obs_module_text("Maximum")));				  
 	vBitrateEdit->addItem(QT_UTF8(obs_module_text("CustomValue")));
 
 	connect(vBitrateEdit, comboIndexChanged, [=](int index) {
@@ -72,21 +77,7 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 		if (bitrate == 0 || vBitrate == bitrate)
 			return;
 		vBitrate = bitrate;
-#else
-	vBitrateEdit = new QSpinBox(this);
-	vBitrateEdit->setObjectName(QStringLiteral("vBitrateEdit"));
-	vBitrateEdit->setMinimum(200);
-	vBitrateEdit->setMaximum(1000000);
-	vBitrateEdit->setValue(2000);
-	vBitrateEdit->setSuffix(" Kbps");
 
-	auto sbValueChanged =
-		static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged);
-	connect(vBitrateEdit, sbValueChanged, [=](int value) {
-		if (value == vBitrate)
-			return;
-		vBitrate = value;
-#endif
 		auto *config = obs_frontend_get_profile_config();
 		if (!config)
 			return;
@@ -119,7 +110,7 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 	mainLayout->addWidget(aBitrateLabel);
 
 	aBitrateEdit = new QComboBox(this);
-#ifdef LOUPER
+
 	aBitrateEdit->addItem(QStringLiteral("128 Kbps ") +
 			      QT_UTF8(obs_module_text("Medium")));
 	aBitrateEdit->addItem(QStringLiteral("160 Kbps ") +
@@ -128,21 +119,6 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 			      QT_UTF8(obs_module_text("SuperHigh")));
 	aBitrateEdit->addItem(QStringLiteral("512 Kbps ") +
 			      QT_UTF8(obs_module_text("Extreme")));
-#else
-	aBitrateEdit->addItem(QStringLiteral("48"));
-	aBitrateEdit->addItem(QStringLiteral("64"));
-	aBitrateEdit->addItem(QStringLiteral("80"));
-	aBitrateEdit->addItem(QStringLiteral("96"));
-	aBitrateEdit->addItem(QStringLiteral("112"));
-	aBitrateEdit->addItem(QStringLiteral("128"));
-	aBitrateEdit->addItem(QStringLiteral("160"));
-	aBitrateEdit->addItem(QStringLiteral("192"));
-	aBitrateEdit->addItem(QStringLiteral("224"));
-	aBitrateEdit->addItem(QStringLiteral("256"));
-	aBitrateEdit->addItem(QStringLiteral("288"));
-	aBitrateEdit->addItem(QStringLiteral("320"));
-	aBitrateEdit->addItem(QStringLiteral("352"));
-#endif
 
 	connect(aBitrateEdit, comboIndexChanged, [=](int index) {
 		uint64_t bitrate = 0;
@@ -248,7 +224,7 @@ void BitrateDock::UpdateValues()
 	if (videoBitrate != vBitrate) {
 
 		vBitrate = videoBitrate;
-#ifdef LOUPER
+
 		int index = vBitrateEdit->findText(
 			QString::number(vBitrate) + " ", Qt::MatchStartsWith);
 		if (index != -1) {
@@ -260,9 +236,7 @@ void BitrateDock::UpdateValues()
 			vBitrateEdit->setEditable(true);
 			vBitrateEdit->setCurrentText(QString::number(vBitrate));
 		}
-#else
-		vBitrateEdit->setValue(vBitrate);
-#endif
+
 	}
 	if (audioBitrate != aBitrate) {
 		aBitrate = audioBitrate;

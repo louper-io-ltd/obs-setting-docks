@@ -12,11 +12,8 @@ class BitrateDock : public QDockWidget {
 
 private:
 	QVBoxLayout *mainLayout;
-#ifdef LOUPER
+
 	QComboBox *vBitrateEdit;
-#else
-	QSpinBox *vBitrateEdit;
-#endif
 	QComboBox *aBitrateEdit;
 	uint64_t vBitrate;
 	uint64_t aBitrate;
