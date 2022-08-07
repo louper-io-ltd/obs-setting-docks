@@ -39,10 +39,8 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 	vBitrateLabel->setText(QT_UTF8(obs_module_text("VideoBitrate")));
 
 	mainLayout->addWidget(vBitrateLabel);
-
+#ifdef LOUPER
 	vBitrateEdit = new QComboBox(this);
-	vBitrateEdit->addItem(QStringLiteral("1250 Kbps ") +
-			      QT_UTF8(obs_module_text("Very Low")));
 	vBitrateEdit->addItem(QStringLiteral("2500 Kbps ") +
 			      QT_UTF8(obs_module_text("Balanced")));
 	vBitrateEdit->addItem(QStringLiteral("4000 Kbps ") +
@@ -55,8 +53,6 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 			      QT_UTF8(obs_module_text("UltraHigh")));
 	vBitrateEdit->addItem(QStringLiteral("15000 Kbps ") +
 			      QT_UTF8(obs_module_text("Extreme")));
-	vBitrateEdit->addItem(QStringLiteral("20000 Kbps ") +
-			      QT_UTF8(obs_module_text("Maximum")));
 	vBitrateEdit->addItem(QT_UTF8(obs_module_text("CustomValue")));
 
 	connect(vBitrateEdit, comboIndexChanged, [=](int index) {
@@ -76,21 +72,21 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 		if (bitrate == 0 || vBitrate == bitrate)
 			return;
 		vBitrate = bitrate;
-// #else
-// 	vBitrateEdit = new QSpinBox(this);
-// 	vBitrateEdit->setObjectName(QStringLiteral("vBitrateEdit"));
-// 	vBitrateEdit->setMinimum(200);
-// 	vBitrateEdit->setMaximum(1000000);
-// 	vBitrateEdit->setValue(2000);
-// 	vBitrateEdit->setSuffix(" Kbps");
+#else
+	vBitrateEdit = new QSpinBox(this);
+	vBitrateEdit->setObjectName(QStringLiteral("vBitrateEdit"));
+	vBitrateEdit->setMinimum(200);
+	vBitrateEdit->setMaximum(1000000);
+	vBitrateEdit->setValue(2000);
+	vBitrateEdit->setSuffix(" Kbps");
 
-// 	auto sbValueChanged =
-// 		static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged);
-// 	connect(vBitrateEdit, sbValueChanged, [=](int value) {
-// 		if (value == vBitrate)
-// 			return;
-// 		vBitrate = value;
-// #endif
+	auto sbValueChanged =
+		static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged);
+	connect(vBitrateEdit, sbValueChanged, [=](int value) {
+		if (value == vBitrate)
+			return;
+		vBitrate = value;
+#endif
 		auto *config = obs_frontend_get_profile_config();
 		if (!config)
 			return;
