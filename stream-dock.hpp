@@ -1,5 +1,6 @@
 
-
+#include <QComboBox>
+#include <QLabel>
 #include <QDockWidget>
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -12,9 +13,12 @@ class StreamDock : public QDockWidget {
 
 private:
 	QVBoxLayout *mainLayout;
+	QComboBox *protocolDropdown;
 	QLineEdit *serverEdit;
 	QLineEdit *keyEdit;
 	QPushButton *showButton;
+	QLabel *keyLabel;
+	QString protocol;
 	QString key;
 	QString server;
 private slots:
@@ -24,4 +28,5 @@ public:
 	StreamDock(QWidget *parent = nullptr);
 	~StreamDock();
 	void UpdateValues();
+	void ProtocolSwitched();
 };
