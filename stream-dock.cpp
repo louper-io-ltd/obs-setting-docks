@@ -4,6 +4,8 @@
 
 #include "obs-frontend-api.h"
 #include "obs-module.h"
+#include "util/config-file.h"
+#include "util/lexer.h"
 
 #define QT_UTF8(str) QString::fromUtf8(str)
 #define QT_TO_UTF8(str) str.toUtf8().constData()
@@ -56,6 +58,12 @@ StreamDock::StreamDock(QWidget *parent) : QDockWidget(parent)
 
 	connect(protocolDropdown, &QComboBox::currentTextChanged, [=]() {
 		ProtocolSwitched();
+
+		auto* config = obs_frontend_get_profile_config();
+		if (!config)
+			return;
+		config_set_uint(config, "Stream", "protocolDropdown", protocolDropdown->currentIndex());
+		config_save(config);
 		});
 
 	mainLayout->addWidget(protocolDropdown);
@@ -143,8 +151,14 @@ StreamDock::StreamDock(QWidget *parent) : QDockWidget(parent)
 
 	mainLayout->addItem(verticalSpacer);
 
-	protocolDropdown->setCurrentText(QT_UTF8(obs_module_text("Protocol")));
-	ProtocolSwitched();
+	auto* config = obs_frontend_get_profile_config();
+	if (config)
+	{
+		int saved_index = config_get_uint(config, "Stream", "protocolDropdown");
+		protocolDropdown->setCurrentIndex(saved_index);
+
+		ProtocolSwitched();
+	}
 
 	auto *dockWidgetContents = new QWidget;
 	dockWidgetContents->setLayout(mainLayout);
@@ -194,10 +208,24 @@ void StreamDock::ProtocolSwitched()
 		showButton->setHidden(true);
 		keyLabel->setHidden(true);
 	}
-	if (protocol == "RTMP")
+	else if (protocol == "RTMP")
 	{
 		keyEdit->setHidden(false);
 		showButton->setHidden(false);
 		keyLabel->setHidden(false);
 	}
+	else
+	{
+		return;
+	}
+
+	//auto* service = obs_frontend_get_streaming_service();
+	//if (!service)
+	//	return;
+	//
+	//obs_data_t* settings = obs_service_get_settings(service);
+	//obs_data_set_int(settings, "protocolDropdown", protocolDropdown->currentIndex());
+	//obs_service_update(service, settings);
+	//obs_data_release(settings);
+	//obs_frontend_save_streaming_service();
 }
