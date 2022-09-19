@@ -218,14 +218,4 @@ void StreamDock::ProtocolSwitched()
 	{
 		return;
 	}
-
-	//auto* service = obs_frontend_get_streaming_service();
-	//if (!service)
-	//	return;
-	//
-	//obs_data_t* settings = obs_service_get_settings(service);
-	//obs_data_set_int(settings, "protocolDropdown", protocolDropdown->currentIndex());
-	//obs_service_update(service, settings);
-	//obs_data_release(settings);
-	//obs_frontend_save_streaming_service();
 }
