@@ -1,10 +1,11 @@
 #include "stream-dock.hpp"
 
-#include <QLabel>
 #include <QTimer>
 
 #include "obs-frontend-api.h"
 #include "obs-module.h"
+#include "util/config-file.h"
+#include "util/lexer.h"
 
 #define QT_UTF8(str) QString::fromUtf8(str)
 #define QT_TO_UTF8(str) str.toUtf8().constData()
@@ -44,6 +45,29 @@ StreamDock::StreamDock(QWidget *parent) : QDockWidget(parent)
 
 	mainLayout = new QVBoxLayout(this);
 
+	auto* protocolLabel = new QLabel(this);
+	protocolLabel->setObjectName(QStringLiteral("protocolLabel"));
+	protocolLabel->setText(QT_UTF8(obs_module_text("Protocol")));
+
+	mainLayout->addWidget(protocolLabel);
+
+	protocolDropdown = new QComboBox(this);
+	protocolDropdown->setObjectName(QStringLiteral("protocolDropdown"));
+	protocolDropdown->addItem(QString("RTMP"));
+	protocolDropdown->addItem(QString("SRT"));
+
+	connect(protocolDropdown, &QComboBox::currentTextChanged, [=]() {
+		ProtocolSwitched();
+
+		auto* config = obs_frontend_get_profile_config();
+		if (!config)
+			return;
+		config_set_uint(config, "Stream", "protocolDropdown", protocolDropdown->currentIndex());
+		config_save(config);
+		});
+
+	mainLayout->addWidget(protocolDropdown);
+
 	auto *serverLabel = new QLabel(this);
 	serverLabel->setObjectName(QStringLiteral("serverLabel"));
 	serverLabel->setText(QT_UTF8(obs_module_text("Server")));
@@ -73,7 +97,7 @@ StreamDock::StreamDock(QWidget *parent) : QDockWidget(parent)
 
 	mainLayout->addWidget(serverEdit);
 
-	auto *keyLabel = new QLabel(this);
+	keyLabel = new QLabel(this);
 	keyLabel->setObjectName(QStringLiteral("keyLabel"));
 	keyLabel->setText(QT_UTF8(obs_module_text("StreamKey")));
 
@@ -127,6 +151,15 @@ StreamDock::StreamDock(QWidget *parent) : QDockWidget(parent)
 
 	mainLayout->addItem(verticalSpacer);
 
+	auto* config = obs_frontend_get_profile_config();
+	if (config)
+	{
+		int saved_index = config_get_uint(config, "Stream", "protocolDropdown");
+		protocolDropdown->setCurrentIndex(saved_index);
+
+		ProtocolSwitched();
+	}
+
 	auto *dockWidgetContents = new QWidget;
 	dockWidgetContents->setLayout(mainLayout);
 
@@ -161,5 +194,28 @@ void StreamDock::UpdateValues()
 	if (k != key) {
 		key = k;
 		keyEdit->setText(k);
+	}
+}
+
+void StreamDock::ProtocolSwitched()
+{
+	if (protocol == protocolDropdown->currentText())
+		return;
+	protocol = protocolDropdown->currentText();
+	if (protocol == "SRT")
+	{
+		keyEdit->setHidden(true);
+		showButton->setHidden(true);
+		keyLabel->setHidden(true);
+	}
+	else if (protocol == "RTMP")
+	{
+		keyEdit->setHidden(false);
+		showButton->setHidden(false);
+		keyLabel->setHidden(false);
+	}
+	else
+	{
+		return;
 	}
 }
