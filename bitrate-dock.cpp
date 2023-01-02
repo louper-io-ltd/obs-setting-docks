@@ -117,8 +117,8 @@ BitrateDock::BitrateDock(QWidget *parent) : QDockWidget(parent)
 			      QT_UTF8(obs_module_text("High")));
 	aBitrateEdit->addItem(QStringLiteral("320 Kbps ") +
 			      QT_UTF8(obs_module_text("SuperHigh")));
-	// aBitrateEdit->addItem(QStringLiteral("512 Kbps ") +
-	// 		      QT_UTF8(obs_module_text("Extreme")));
+	aBitrateEdit->addItem(QStringLiteral("512 Kbps ") +
+			      QT_UTF8(obs_module_text("Extreme")));
 
 	connect(aBitrateEdit, comboIndexChanged, [=](int index) {
 		uint64_t bitrate = 0;
